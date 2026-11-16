@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	api "codeberg.org/Nxus/quick-qr-api/internal/server/endpoints"
+	generateqr "codeberg.org/Nxus/quick-qr-api/internal/server/generate-qr"
+	"codeberg.org/Nxus/quick-qr-api/internal/server/helloworld"
 )
 
 
@@ -24,8 +25,10 @@ func (s *MyServer) Start() error {
 }
 
 func (s *MyServer) HandleFunc() {
-	endpoints :=  api.MyEndpoints{}
-	endpoints.HelloWorld()
+	helloW := helloworld.MyHandler{}
+	http.HandleFunc("/", helloW.HelloWorld)
+	qr := generateqr.MyHandler{}
+	http.HandleFunc("/api/generateqr", qr.GenerateQr)
 }
 
 
