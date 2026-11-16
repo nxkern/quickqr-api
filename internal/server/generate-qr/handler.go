@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
 )
 
+// Handler handles QR code HTTP requests.
 type Handler interface {
 	GenerateQr(w http.ResponseWriter, r *http.Request)
 }
 
+// MyHandler implements the Handler interface for QR generation.
 type MyHandler struct{}
 
-
+// GenerateQr calls MyQR.GenerateQr and sends the image in the response
 func (h *MyHandler) GenerateQr(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusBadRequest)
