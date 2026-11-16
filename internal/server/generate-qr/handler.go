@@ -46,4 +46,3 @@ func (h *MyHandler) GenerateQr(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-

@@ -24,5 +24,3 @@ func TestHelloWorld(t *testing.T) {
 		t.Errorf("error get data %s, get %s", waited, rr.Body.String())
 	}
 }
-
-

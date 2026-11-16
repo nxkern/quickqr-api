@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	generateqr "codeberg.org/Nxus/quick-qr-api/internal/server/generate-qr"
+	"codeberg.org/Nxus/quick-qr-api/internal/server/healthcheck"
 	"codeberg.org/Nxus/quick-qr-api/internal/server/helloworld"
 )
-
 
 type Server interface {
 	Start() error
@@ -29,7 +29,6 @@ func (s *MyServer) HandleFunc() {
 	http.HandleFunc("/", helloW.HelloWorld)
 	qr := generateqr.MyHandler{}
 	http.HandleFunc("/api/generateqr", qr.GenerateQr)
+	health := healthcheck.MyHandler{}
+	http.HandleFunc("/api/health", health.HealthCheck)
 }
-
-
-

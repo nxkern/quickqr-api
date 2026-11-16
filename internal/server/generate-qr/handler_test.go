@@ -23,7 +23,6 @@ func TestHandlerGenerateQr(t *testing.T) {
 		t.Errorf("error marshal json %v", err)
 	}
 
-
 	req := httptest.NewRequest(http.MethodPost, "/api/generateqr", bytes.NewBuffer(bodyJson))
 	rr := httptest.NewRecorder()
 	ep.GenerateQr(rr, req)
@@ -50,12 +49,11 @@ func helper(png []byte, text string) error {
 	if err != nil {
 		return fmt.Errorf("failed recognize %v", err)
 	}
-	if (len(qrCodes) == 1) {
+	if len(qrCodes) == 1 {
+
 		if text != string(qrCodes[0].Payload) {
 			return fmt.Errorf("incorrect content")
 		}
 	}
 	return nil
 }
-
-

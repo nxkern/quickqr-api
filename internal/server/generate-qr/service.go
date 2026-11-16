@@ -14,7 +14,7 @@ type QR interface {
 // MyQR implements the QR interface for QR code generation.
 type MyQR struct{}
 
-// GenerateQr generates QR code and return the image 
+// GenerateQr generates QR code and return the image
 func (qr *MyQR) GenerateQr(png *[]byte, text string, size int) error {
 	var err error
 
@@ -24,4 +24,3 @@ func (qr *MyQR) GenerateQr(png *[]byte, text string, size int) error {
 	}
 	return nil
 }
-
