@@ -8,35 +8,35 @@ on:
 env:
   IMAGE_BASE_NAME: quickqr-api
 
-  jobs:
-    API_Image:
-      runs-ons: codeberg-small
-      steps:
-        - name: Check out the repo
-          uses: actions/checkout@v6
+jobs:
+  API_Image:
+    runs-ons: codeberg-small
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v6
 
-        - name: Install Buildah
-          run: |
-            sudo apt-get update
-            sudo apt-get install -y buildah
+      - name: Install Buildah
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y buildah
 
-        - name: Log in to Docker Hub
-          run: |
-            echo "${{ secrets.REGISTRY_TOKEN }}" | buildah login docker.io -u "${{ secrets.REGISTRY_TOKEN }}" --password-stdin
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | buildah login docker.io -u "${{ secrets.REGISTRY_TOKEN }}" --password-stdin
 
-        - name: Looking for files
-          run: ls -a
+      - name: Looking for files
+        run: ls -a
 
-        - name: Build Docker Go image
-          run: |
-            buildah build \
-            --storage-driver=vfs \
-            --isolation=chroot \
-            -t docker.io/nxusdev21/$IMAGE_BASE_NAME:latest \
-            -f ./Dockerfile
+      - name: Build Docker Go image
+        run: |
+          buildah build \
+          --storage-driver=vfs \
+          --isolation=chroot \
+          -t docker.io/nxusdev21/$IMAGE_BASE_NAME:latest \
+          -f ./Dockerfile
 
-        - name: Push to Docker hub
-          run: |
-            buildah push \
-            --storage-driver=vfs \
-            docker.io/nxusdev21/$IMAGE_BASE_NAME:latest
+      - name: Push to Docker hub
+        run: |
+          buildah push \
+          --storage-driver=vfs \
+          docker.io/nxusdev21/$IMAGE_BASE_NAME:latest
