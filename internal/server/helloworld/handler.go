@@ -9,7 +9,7 @@ type Handler interface {
 	HelloWorld(w http.ResponseWriter, r *http.Request)
 }
 
-type MyHandler struct {}
+type MyHandler struct{}
 
 func (h *MyHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {

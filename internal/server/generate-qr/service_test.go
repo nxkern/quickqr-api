@@ -29,7 +29,7 @@ func TestGenerareQr(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed recognize %v", err)
 	}
-	if (len(qrCodes) == 1) {
+	if len(qrCodes) == 1 {
 		if text != string(qrCodes[0].Payload) {
 			t.Errorf("incorrect content")
 		}

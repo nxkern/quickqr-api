@@ -1,4 +1,4 @@
-.PHONY: build dev clean test tidy
+.PHONY: build dev clean test tidy fmt
 
 OPTION ?= pkgname
 
@@ -16,3 +16,6 @@ test:
 
 tidy: 
 	go mod tidy
+
+fmt:
+	go fmt ./...

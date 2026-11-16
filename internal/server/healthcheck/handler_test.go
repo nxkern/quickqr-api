@@ -15,4 +15,3 @@ func TestHealhCheck(t *testing.T) {
 		t.Errorf("error status code: %d", rr.Code)
 	}
 }
-

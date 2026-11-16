@@ -9,7 +9,6 @@ import (
 	"codeberg.org/Nxus/quick-qr-api/internal/server/helloworld"
 )
 
-
 type Server interface {
 	Start() error
 	HandleEndpoints()
@@ -33,6 +32,3 @@ func (s *MyServer) HandleFunc() {
 	health := healthcheck.MyHandler{}
 	http.HandleFunc("/api/health", health.HealthCheck)
 }
-
-
-

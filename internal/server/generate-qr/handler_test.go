@@ -50,7 +50,7 @@ func helper(png []byte, text string) error {
 		return fmt.Errorf("failed recognize %v", err)
 	}
 	if len(qrCodes) == 1 {
-		
+
 		if text != string(qrCodes[0].Payload) {
 			return fmt.Errorf("incorrect content")
 		}
