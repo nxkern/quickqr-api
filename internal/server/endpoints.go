@@ -3,11 +3,15 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"slices"
 
+	"codeberg.org/Nxus/quick-qr-api/internal/middlewares"
 	generateqr "codeberg.org/Nxus/quick-qr-api/internal/server/generate-qr"
 	"codeberg.org/Nxus/quick-qr-api/internal/server/healthcheck"
 	"codeberg.org/Nxus/quick-qr-api/internal/server/helloworld"
 )
+
+type Middleware func(http.Handler) http.Handler
 
 type Server interface {
 	Start() error
@@ -15,8 +19,9 @@ type Server interface {
 }
 
 type MyServer struct {
-	Addr    string
-	Handler http.Handler
+	Addr      string
+	Handler   http.Handler
+	IpLimiter *middlewares.IPRateLimiter
 }
 
 func (s *MyServer) Start() error {
@@ -26,9 +31,25 @@ func (s *MyServer) Start() error {
 
 func (s *MyServer) HandleFunc() {
 	helloW := helloworld.MyHandler{}
-	http.HandleFunc("/", helloW.HelloWorld)
+	helloHandle := Chain(http.HandlerFunc(helloW.HelloWorld), func(h http.Handler) http.Handler {
+		return middlewares.PerClientRateLimit(s.IpLimiter, h)
+	})
+	http.Handle("/", helloHandle)
 	qr := generateqr.MyHandler{}
-	http.HandleFunc("/api/generateqr", qr.GenerateQr)
+	generateQrHandle := Chain(http.HandlerFunc(qr.GenerateQr), func(h http.Handler) http.Handler {
+		return middlewares.PerClientRateLimit(s.IpLimiter, h)
+	})
+	http.Handle("/api/generateqr", generateQrHandle)
 	health := healthcheck.MyHandler{}
-	http.HandleFunc("/api/health", health.HealthCheck)
+	healthHandle := Chain(http.HandlerFunc(health.HealthCheck), func(h http.Handler) http.Handler {
+		return middlewares.PerClientRateLimit(s.IpLimiter, h)
+	})
+	http.Handle("/api/health", healthHandle)
+}
+
+func Chain(handle http.Handler, middle ...Middleware) http.Handler {
+	for i := range slices.Backward(middle) {
+		handle = middle[i](handle)
+	}
+	return handle
 }
