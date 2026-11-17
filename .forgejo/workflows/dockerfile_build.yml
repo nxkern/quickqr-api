@@ -10,7 +10,7 @@ env:
 
 jobs:
   API_Image:
-    runs-ons: codeberg-small
+    runs-on: codeberg-small
     steps:
       - name: Check out the repo
         uses: actions/checkout@v6
