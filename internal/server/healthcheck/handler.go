@@ -21,6 +21,7 @@ func (h *MyHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method no alllowed", http.StatusBadRequest)
 		return
 	}
+	log.Println("healthcheck pass")
 	healthService := MyHealthService{}
 	health := &Health{
 		Status: "ok",
