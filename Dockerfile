@@ -5,7 +5,7 @@ COPY go.mod go.sum Makefile ./
 COPY . .
 RUN make
 
-FROM scratch AS runner
+FROM alpine:latest AS runner
 WORKDIR /app
 
 COPY --from=builder /app/bin ./bin
