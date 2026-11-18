@@ -2,6 +2,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -74,6 +75,7 @@ func getClientIP(r *http.Request) (ip string) {
 	if err != nil {
 		ip = r.RemoteAddr
 	}
+	fmt.Printf("[api/middleware] get ip for dev %s\n", ip)
 	log.Printf("[api/middleware] get ip for dev %s\n", ip)
 	return ip
 }
