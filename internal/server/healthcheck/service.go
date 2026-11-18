@@ -1,6 +1,6 @@
 package healthcheck
 
-import generateqr "codeberg.org/Nxus/quick-qr-api/internal/server/generate-qr"
+import generateqr "github.com/nxkern/quick-qr-api/internal/server/generate-qr"
 
 // HealthService defines operations for performing health checks on services.
 type HealthService interface {

@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"slices"
 
-	"codeberg.org/Nxus/quick-qr-api/internal/middlewares"
-	generateqr "codeberg.org/Nxus/quick-qr-api/internal/server/generate-qr"
-	"codeberg.org/Nxus/quick-qr-api/internal/server/healthcheck"
-	"codeberg.org/Nxus/quick-qr-api/internal/server/helloworld"
+	"github.com/nxkern/quick-qr-api/internal/middlewares"
+	generateqr "github.com/nxkern/quick-qr-api/internal/server/generate-qr"
+	"github.com/nxkern/quick-qr-api/internal/server/healthcheck"
+	"github.com/nxkern/quick-qr-api/internal/server/helloworld"
 )
 
 type Middleware func(http.Handler) http.Handler
