@@ -6,7 +6,7 @@ on:
     branches: ["main"]
 
 env:
-  IMAGE_BASE_NAME: quickqr-api
+  IMAGE_BASE_NAME: ${{ secrets.REGISTRY_USER }}/quickqr-api
 
 jobs:
   API_Image:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Docker Go image
         run: |
-          docker build --platform linux -t docker.io/"${{ secrets.REGISTRY_USER }}"/$IMAGE_BASE_NAME:latest .
+          docker build --platform linux -t $IMAGE_BASE_NAME:latest .
 
       - name: Push to Docker hub
         run: |
