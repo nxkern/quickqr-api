@@ -49,14 +49,7 @@ func NewIPRateLimiter(r rate.Limit, b int) *IPRateLimiter {
 // PerClientRateLimit returns an HTTP handler middleware that enforces rate limits per client IP.
 func PerClientRateLimit(ipLimiter *IPRateLimiter, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip, _, err := net.SplitHostPort(r.RemoteAddr)
-		s := getClientIP(r)
-		_ = s
-		if err != nil {
-			log.Printf("[middleware/ratelimit] error: %v\n", err)
-			http.Error(w, "internal server error", http.StatusInternalServerError)
-			return
-		}
+		ip := getClientIP(r)
 		limiter := ipLimiter.GetLimiter(ip)
 		if !limiter.Allow() {
 			log.Println("[middleware/ratelimit] limit exceed")
@@ -67,6 +60,7 @@ func PerClientRateLimit(ipLimiter *IPRateLimiter, next http.Handler) http.Handle
 	})
 }
 
+// getClientIP extracts the client IP address from request headers or remote address.
 func getClientIP(r *http.Request) (ip string) {
 	for name, values := range r.Header {
 		if strings.ToLower(name) == "cf-connection-ip" {
@@ -84,6 +78,7 @@ func getClientIP(r *http.Request) (ip string) {
 	return ip
 }
 
+// searchIp parses and returns the IP address from header values based on the source platform.
 func searchIp(values []string, target string) string {
 	switch target {
 	case "cloudflare":
