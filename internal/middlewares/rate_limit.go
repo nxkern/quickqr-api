@@ -71,11 +71,14 @@ func getClientIP(r *http.Request) (ip string) {
 			ip = searchIp(values, "caddy")
 		}
 	}
-	ip, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		ip = r.RemoteAddr
+	if ip == "" {
+		ipLocal, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			ip = r.RemoteAddr
+		} else {
+			ip = ipLocal
+		}
 	}
-	fmt.Printf("[api/middleware] get ip for dev %s\n", ip)
 	log.Printf("[api/middleware] get ip for dev %s\n", ip)
 	return ip
 }

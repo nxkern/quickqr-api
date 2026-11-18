@@ -2,7 +2,6 @@ package healthcheck
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 )
@@ -22,8 +21,6 @@ func (h *MyHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method no alllowed", http.StatusBadRequest)
 		return
 	}
-	fmt.Println("fmt healthcheck pass")
-	log.Println("log healthcheck pass")
 	healthService := MyHealthService{}
 	health := &Health{
 		Status: "ok",

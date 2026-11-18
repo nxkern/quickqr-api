@@ -31,15 +31,18 @@ func (s *MyServer) Start() error {
 
 func (s *MyServer) HandleFunc() {
 	helloW := helloworld.MyHandler{}
+
 	helloHandle := Chain(http.HandlerFunc(helloW.HelloWorld), func(h http.Handler) http.Handler {
 		return middlewares.PerClientRateLimit(s.IpLimiter, h)
 	})
 	http.Handle("/", helloHandle)
+
 	qr := generateqr.MyHandler{}
 	generateQrHandle := Chain(http.HandlerFunc(qr.GenerateQr), func(h http.Handler) http.Handler {
 		return middlewares.PerClientRateLimit(s.IpLimiter, h)
 	})
 	http.Handle("/api/generateqr", generateQrHandle)
+
 	health := healthcheck.MyHandler{}
 	healthHandle := Chain(http.HandlerFunc(health.HealthCheck), func(h http.Handler) http.Handler {
 		return middlewares.PerClientRateLimit(s.IpLimiter, h)
