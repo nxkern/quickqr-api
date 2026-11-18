@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 
 	"golang.org/x/time/rate"
@@ -49,6 +50,8 @@ func NewIPRateLimiter(r rate.Limit, b int) *IPRateLimiter {
 func PerClientRateLimit(ipLimiter *IPRateLimiter, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip, _, err := net.SplitHostPort(r.RemoteAddr)
+		s := getClientIP(r)
+		_ = s
 		if err != nil {
 			log.Printf("[middleware/ratelimit] error: %v\n", err)
 			http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -62,4 +65,41 @@ func PerClientRateLimit(ipLimiter *IPRateLimiter, next http.Handler) http.Handle
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+func getClientIP(r *http.Request) (ip string) {
+	for name, values := range r.Header {
+		if strings.ToLower(name) == "cf-connection-ip" {
+			ip = searchIp(values, "cloudflare")
+		}
+		if strings.ToLower(name) == "x-forwarded-for" {
+			ip = searchIp(values, "caddy")
+		}
+	}
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		ip = r.RemoteAddr
+	}
+	log.Printf("[api/middleware] get ip for dev %s\n", ip)
+	return ip
+}
+
+func searchIp(values []string, target string) string {
+	switch target {
+	case "cloudflare":
+		for _, ip := range values {
+			if ip != "" {
+				return strings.TrimSpace(ip)
+			}
+		}
+	case "caddy":
+		for _, xff := range values {
+			if xff != "" {
+				ips := strings.Split(xff, ",")
+				return strings.TrimSpace(ips[0])
+			}
+		}
+
+	}
+	return ""
 }
