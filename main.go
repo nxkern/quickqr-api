@@ -1,8 +1,8 @@
 package main
 
 import (
-	"codeberg.org/Nxus/quick-qr-api/internal/middlewares"
-	"codeberg.org/Nxus/quick-qr-api/internal/server"
+	"github.com/nxkern/quick-qr-api/internal/middlewares"
+	"github.com/nxkern/quick-qr-api/internal/server"
 )
 
 func main() {

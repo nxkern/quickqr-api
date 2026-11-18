@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"codeberg.org/Nxus/quick-qr-api/internal/server/helloworld"
+	"github.com/nxkern/quick-qr-api/internal/server/helloworld"
 )
 
 func TestRateLimit(t *testing.T) {
