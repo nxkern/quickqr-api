@@ -63,7 +63,7 @@ func PerClientRateLimit(ipLimiter *IPRateLimiter, next http.Handler) http.Handle
 // getClientIP extracts the client IP address from request headers or remote address.
 func getClientIP(r *http.Request) (ip string) {
 	for name, values := range r.Header {
-		if strings.ToLower(name) == "cf-connection-ip" {
+		if strings.ToLower(name) == "cf-connecting-ip" {
 			ip = searchIp(values, "cloudflare")
 		}
 		if strings.ToLower(name) == "x-forwarded-for" {
