@@ -25,9 +25,8 @@ func main() {
 		IpLimiter: rateLimiter,
 	}
 	srv.HandleEndpoints()
-	if err := 	srv.Start(ctx); err != nil {
+	if err := srv.Start(ctx); err != nil {
 		log.Fatalf("internal server error: %v", err)
 	}
 	log.Println("Shutdown server...")
-
 }
