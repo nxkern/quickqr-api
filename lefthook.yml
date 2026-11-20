@@ -1,0 +1,7 @@
+pre-commit:
+  commands:
+    fmt:
+      run: make fmt
+      stage_fixed: true
+    linter:
+      run: make lint

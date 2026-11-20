@@ -26,7 +26,11 @@ func TestServer(t *testing.T) {
 	if err != nil {
 		t.Errorf("error request healthcheck: %v", err)
 	}
-	defer respHealthCheck.Body.Close()
+	defer func() {
+		if err := respHealthCheck.Body.Close(); err != nil {
+			t.Errorf("error closing response body %s: %v", respHealthCheck.Request.URL, err)
+		}
+	}()
 	if respHealthCheck.StatusCode != http.StatusOK {
 		t.Errorf("error status code: %v", respHealthCheck.StatusCode)
 	}
@@ -42,13 +46,17 @@ func TestServer(t *testing.T) {
 		t.Errorf("error marshal json: %v", err)
 	}
 
-	respGenerateQr, err := http.Post(fmt.Sprintf("%s/api/generateqr", ts.URL),"application/json", bytes.NewBuffer(bodyJson))
+	respGenerateQr, err := http.Post(fmt.Sprintf("%s/api/generateqr", ts.URL), "application/json", bytes.NewBuffer(bodyJson))
 
 	if err != nil {
 		t.Errorf("error request generate: %v", err)
 	}
 
-	defer respGenerateQr.Body.Close()
+	defer func() {
+		if err := respGenerateQr.Body.Close(); err != nil {
+			t.Errorf("error closing response body %s: %v", respGenerateQr.Request.URL, err)
+		}
+	}()
 	if respGenerateQr.StatusCode != http.StatusOK {
 		t.Errorf("error status code: %v", respGenerateQr.StatusCode)
 	}

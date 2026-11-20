@@ -12,8 +12,8 @@ func TestGenerareQr(t *testing.T) {
 	qr := MyQR{}
 	var (
 		png  []byte
-		size int    = 256
-		text string = "testing"
+		size = 256
+		text = "testing"
 	)
 
 	err := qr.GenerateQr(&png, text, size)
