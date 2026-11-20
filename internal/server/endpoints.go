@@ -1,3 +1,4 @@
+// Package server provides HTTP server configuration, routing, and lifecycle management.
 package server
 
 import (
@@ -14,19 +15,23 @@ import (
 	"github.com/nxkern/quick-qr-api/internal/server/helloworld"
 )
 
+// Middleware defines a function signature for wrapping an http.Handler.
 type Middleware func(http.Handler) http.Handler
 
+// Server defines the interface for managing an HTTP server lifecycle and route setup.
 type Server interface {
 	Start(ctx context.Context) error
 	HandleEndpoints()
 }
 
+// MyServer implements the Server interface for managing the HTTP application server.
 type MyServer struct {
 	Addr      string
 	Handler   http.Handler
 	IpLimiter *middlewares.IPRateLimiter
 }
 
+// Start listens for incoming requests and gracefully shuts down when ctx is done.
 func (s *MyServer) Start(ctx context.Context) error {
 	srv := http.Server{
 		Addr:    s.Addr,
@@ -51,14 +56,11 @@ func (s *MyServer) Start(ctx context.Context) error {
 	}
 }
 
-func (s *MyServer) Stop(shutdownCtx context.Context) error {
-	return nil
-}
-
+// HandleEndpoints initializes routes and registers middleware handlers.
 func (s *MyServer) HandleEndpoints() {
 	mux := http.NewServeMux()
-	helloW := helloworld.MyHandler{}
 
+	helloW := helloworld.MyHandler{}
 	helloHandle := Chain(http.HandlerFunc(helloW.HelloWorld), func(h http.Handler) http.Handler {
 		return middlewares.PerClientRateLimit(s.IpLimiter, h)
 	})
@@ -78,6 +80,7 @@ func (s *MyServer) HandleEndpoints() {
 	s.Handler = mux
 }
 
+// Chain applies multiple Middleware decorators to an http.Handler.
 func Chain(handle http.Handler, middle ...Middleware) http.Handler {
 	for i := range slices.Backward(middle) {
 		handle = middle[i](handle)
