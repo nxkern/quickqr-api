@@ -6,13 +6,17 @@ import (
 	"testing"
 
 	"github.com/nxkern/quick-qr-api/internal/server/helloworld"
+	"go.opentelemetry.io/otel"
 )
 
 func TestRateLimit(t *testing.T) {
 	rateLimiter := NewIPRateLimiter(5, 10)
+	meter := otel.Meter("test")
+	counter, _ := meter.Int64Counter("http.requests")
+
 	hello := &helloworld.MyHandler{}
 
-	handlerWithMiddleware := PerClientRateLimit(rateLimiter, http.HandlerFunc(hello.HelloWorld))
+	handlerWithMiddleware := PerClientRateLimit(rateLimiter, http.HandlerFunc(hello.HelloWorld), counter)
 	for i := range 15 {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.RemoteAddr = "192.168.1.1:1234"

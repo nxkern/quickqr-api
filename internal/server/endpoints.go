@@ -3,6 +3,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"slices"
@@ -13,6 +14,13 @@ import (
 	generateqr "github.com/nxkern/quick-qr-api/internal/server/generate-qr"
 	"github.com/nxkern/quick-qr-api/internal/server/healthcheck"
 	"github.com/nxkern/quick-qr-api/internal/server/helloworld"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+)
+
+var (
+	meter          = otel.Meter("quickqr-api")
+	httpRequest, _ = meter.Int64Counter("http.request")
 )
 
 // Middleware defines a function signature for wrapping an http.Handler.
@@ -38,6 +46,13 @@ func (s *MyServer) Start(ctx context.Context) error {
 		Handler: s.Handler,
 	}
 	errChan := make(chan error, 1)
+	otelShutdown, err := SetupOTelSDK(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = errors.Join(err, otelShutdown(context.Background()))
+	}()
 	var wg sync.WaitGroup
 	wg.Go(func() {
 		fmt.Printf("Server listening in http://localhost%s\n", s.Addr)
@@ -49,7 +64,7 @@ func (s *MyServer) Start(ctx context.Context) error {
 	case err := <-errChan:
 		return err
 	case <-ctx.Done():
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
 		return srv.Shutdown(shutdownCtx)
@@ -62,22 +77,22 @@ func (s *MyServer) HandleEndpoints() {
 
 	helloW := helloworld.MyHandler{}
 	helloHandle := Chain(http.HandlerFunc(helloW.HelloWorld), func(h http.Handler) http.Handler {
-		return middlewares.PerClientRateLimit(s.IpLimiter, h)
+		return middlewares.PerClientRateLimit(s.IpLimiter, h, httpRequest)
 	})
 	mux.Handle("/", helloHandle)
 
 	qr := generateqr.MyHandler{}
 	generateQrHandle := Chain(http.HandlerFunc(qr.GenerateQr), func(h http.Handler) http.Handler {
-		return middlewares.PerClientRateLimit(s.IpLimiter, h)
+		return middlewares.PerClientRateLimit(s.IpLimiter, h, httpRequest)
 	})
 	mux.Handle("/api/generateqr", generateQrHandle)
 
 	health := healthcheck.MyHandler{}
 	healthHandle := Chain(http.HandlerFunc(health.HealthCheck), func(h http.Handler) http.Handler {
-		return middlewares.PerClientRateLimit(s.IpLimiter, h)
+		return middlewares.PerClientRateLimit(s.IpLimiter, h, httpRequest)
 	})
 	mux.Handle("/api/health", healthHandle)
-	s.Handler = mux
+	s.Handler = otelhttp.NewHandler(mux, "/")
 }
 
 // Chain applies multiple Middleware decorators to an http.Handler.
