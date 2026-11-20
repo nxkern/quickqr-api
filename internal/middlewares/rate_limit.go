@@ -70,6 +70,7 @@ func getClientIP(r *http.Request) (ip string) {
 			ip = searchIp(values, "caddy")
 		}
 	}
+	// TODO: move to searchIp
 	if ip == "" {
 		ipLocal, _, err := net.SplitHostPort(r.RemoteAddr)
 		if err != nil {
