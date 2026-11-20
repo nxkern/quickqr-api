@@ -8,6 +8,8 @@ import (
 	"strings"
 	"sync"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 	"golang.org/x/time/rate"
 )
 
@@ -47,7 +49,7 @@ func NewIPRateLimiter(r rate.Limit, b int) *IPRateLimiter {
 }
 
 // PerClientRateLimit returns an HTTP handler middleware that enforces rate limits per client IP.
-func PerClientRateLimit(ipLimiter *IPRateLimiter, next http.Handler) http.Handler {
+func PerClientRateLimit(ipLimiter *IPRateLimiter, next http.Handler, httpRequest metric.Int64Counter) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := getClientIP(r)
 		limiter := ipLimiter.GetLimiter(ip)
@@ -56,6 +58,10 @@ func PerClientRateLimit(ipLimiter *IPRateLimiter, next http.Handler) http.Handle
 			http.Error(w, "limit exceed", http.StatusTooManyRequests)
 			return
 		}
+		httpRequest.Add(r.Context(), 1, metric.WithAttributes(
+			attribute.String("route", r.URL.Path),
+			attribute.String("method", r.Method),
+		))
 		next.ServeHTTP(w, r)
 	})
 }
