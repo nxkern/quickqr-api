@@ -36,6 +36,7 @@
           inherit packages;
           shellHook = ''
             export CGO_ENABLED=0
+            lefthook install
             echo -e "\033[1;32m✔ quickqr-api environment active.\033[0m"
           '';
 
