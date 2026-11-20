@@ -1,3 +1,4 @@
+// Package main is the entry point for the quick-qr-api server application.
 package main
 
 import (
@@ -24,8 +25,9 @@ func main() {
 		IpLimiter: rateLimiter,
 	}
 	srv.HandleEndpoints()
-	srv.Start(ctx)
-	<-ctx.Done()
+	if err := 	srv.Start(ctx); err != nil {
+		log.Fatalf("internal server error: %v", err)
+	}
 	log.Println("Shutdown server...")
 
 }
