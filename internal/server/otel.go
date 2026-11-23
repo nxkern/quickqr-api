@@ -15,7 +15,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 
-// SetupOTelSDK initializes OpenTelemetry providers for tracing, metrics, and logging.
+// SetupOTelSDK initializes OpenTelemetry providers for tracing, metrics, and logging using OTLP HTTP exporters.
 // It returns a cleanup function to gracefully shut down the providers.
 func SetupOTelSDK(ctx context.Context) (func(context.Context) error, error) {
 	var shutdownFuncs []func(context.Context) error
@@ -72,31 +72,31 @@ func newPropagator() propagation.TextMapPropagator {
 	)
 }
 
-// newTracerProvider initializes stdout trace provider.
+// newTracerProvider initializes OTLP HTTP trace provider.
 func newTracerProvider(ctx context.Context) (*trace.TracerProvider, error) {
 	traceExporter, err := otlptracehttp.New(ctx)
 	if err != nil {
 		return nil, err
 	}
 	tracerProvider := trace.NewTracerProvider(
-		trace.WithBatcher(traceExporter, trace.WithBatchTimeout(time.Second)),
+		trace.WithBatcher(traceExporter, trace.WithBatchTimeout(5*time.Second)),
 	)
 	return tracerProvider, nil
 }
 
-// newMeterProvider initializes stdout metric provider.
+// newMeterProvider initializes OTLP HTTP metric provider.
 func newMeterProvider(ctx context.Context) (*metric.MeterProvider, error) {
 	metricsExporter, err := otlpmetrichttp.New(ctx)
 	if err != nil {
 		return nil, err
 	}
 	meterProvider := metric.NewMeterProvider(
-		metric.WithReader(metric.NewPeriodicReader(metricsExporter, metric.WithInterval(3*time.Second))),
+		metric.WithReader(metric.NewPeriodicReader(metricsExporter, metric.WithInterval(1*time.Minute))),
 	)
 	return meterProvider, nil
 }
 
-// newLoggerProvider initializes stdout logger provider.
+// newLoggerProvider initializes OTLP HTTP logger provider.
 func newLoggerProvider(ctx context.Context) (*log.LoggerProvider, error) {
 	logExporter, err := otlploghttp.New(ctx)
 
