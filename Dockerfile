@@ -9,6 +9,9 @@ FROM scratch AS runner
 WORKDIR /app
 
 COPY --from=builder /app/bin ./bin
+ENV OTEL_EXPORTER_OTLP_ENDPOINT=""
+ENV OTEL_SERVICE_NAME=""
+
 EXPOSE 8080
 
 CMD ["./bin/quickqr"]
