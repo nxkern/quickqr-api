@@ -1,1 +1,4 @@
 use flake
+
+export OTEL_EXPORTER_OTLP_ENDPOINT=<your-endpoint-otel>
+export OTEL_SERVICE_NAME=<your-app-name>
